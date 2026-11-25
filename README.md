@@ -29,6 +29,21 @@ uv run pytest
 uv run uvicorn counsel.api.main:app --reload   # http://localhost:8000/health
 ```
 
+### Try the stub email flow
+
+Open http://localhost:8000/docs. Stub stages (gateway, triage, agent) are canned rules held in
+memory, so every route can be exercised before the real stages land.
+
+1. `GET /stub/users` gives the demo reviewer IDs.
+2. `POST /stub/samples/{name}` runs a ready-made email: `nda_external`,
+   `policy_question_internal`, `show_cause_hindi`, `legal_threat_customer`, `invoice_query`,
+   `newsletter`, `prompt_injection`. Or `POST /stub/emails` with your own email.
+3. `GET /stub/review-queue`, then `POST /stub/items/{item_id}/decision` with
+   `{"reviewer_id": "...", "action": "approve" | "edit" | "reject" | "escalate"}`.
+   Approve issues a token bound to the draft hash; sending stays disabled.
+4. `GET /stub/matters`, `GET /stub/audit` to see the matter and every step logged.
+   `POST /stub/reset` clears everything.
+
 After changing a record in `src/counsel/contracts/`:
 
 ```powershell

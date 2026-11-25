@@ -5,6 +5,7 @@ Model IDs live here so they can change without code edits.
 
 from __future__ import annotations
 
+import secrets
 from functools import lru_cache
 
 from pydantic import Field, SecretStr
@@ -16,6 +17,11 @@ class Settings(BaseSettings):
 
     env: str = Field(default="dev", pattern=r"^(dev|ci|shadow)$")
     database_url: SecretStr = SecretStr("postgresql://counsel:counsel_dev@localhost:5433/counsel")
+
+    # Sender domains treated as internal by the policy engine.
+    company_domains: list[str] = ["acme.example"]
+    # Signs approval tokens. Random per process unless set (set it in Secrets Manager outside dev).
+    approval_secret: SecretStr = Field(default_factory=lambda: SecretStr(secrets.token_hex(32)))
 
     # AWS Mumbai. Keep inference in India via the Bedrock India endpoint.
     aws_region: str = "ap-south-1"

@@ -12,7 +12,7 @@ prototype (`src/counsel/policy/sender.py`).
 | `contracts/*.schema.json` | generated | JSON Schemas exported from the models; CI fails if stale |
 | `src/counsel/ingest, triage, matters`, `evals/` | Sana | Intake, triage, matters, test sets |
 | `src/counsel/kb, agent, verify` | Arina | Knowledge, orchestrator, verifier |
-| `src/counsel/gateway, policy, audit, api`, `console/`, `db/`, `infra/`, `.github/` | Abdul | Platform, controls, console |
+| `src/counsel/gateway, policy, audit, api`, `frontend/`, `db/`, `infra/`, `.github/` | Abdul | Platform, controls, console |
 
 ## Local setup (Windows)
 
@@ -43,6 +43,24 @@ memory, so every route can be exercised before the real stages land.
    Approve issues a token bound to the draft hash; sending stays disabled.
 4. `GET /stub/matters`, `GET /stub/audit` to see the matter and every step logged.
    `POST /stub/reset` clears everything.
+
+### Review console (Next.js)
+
+With the API running on :8000:
+
+```powershell
+cd frontend
+npm install
+npm run dev   # http://localhost:3001
+```
+
+Pick a sample email: original email on the left, route, risk score and citations in the middle,
+draft reply with approve / edit / reject / escalate on the right. "Acting as" switches between
+the demo reviewers (the outsider is refused). Requests go to `/api/*`, which Next.js proxies to
+`COUNSEL_API_URL` (default `http://localhost:8000`).
+
+TypeScript types for the 3 records are generated from `contracts/*.schema.json`; after changing
+a record, re-export the schemas and run `npm run gen:types` in `frontend/`.
 
 After changing a record in `src/counsel/contracts/`:
 

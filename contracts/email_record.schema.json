@@ -1,0 +1,493 @@
+{
+  "$defs": {
+    "AttachmentInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "attachment_id": {
+          "minLength": 1,
+          "title": "Attachment Id",
+          "type": "string"
+        },
+        "filename": {
+          "title": "Filename",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LanguageInfo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ocr_used": {
+          "default": false,
+          "title": "Ocr Used",
+          "type": "boolean"
+        },
+        "low_confidence_pages": {
+          "description": "Pages below the OCR confidence floor; sent to a human",
+          "items": {
+            "type": "integer"
+          },
+          "title": "Low Confidence Pages",
+          "type": "array"
+        }
+      },
+      "required": [
+        "attachment_id",
+        "filename",
+        "sha256"
+      ],
+      "title": "AttachmentInfo",
+      "type": "object"
+    },
+    "Category": {
+      "enum": [
+        "contract_review",
+        "vendor_dispute",
+        "customer_dispute",
+        "employment",
+        "regulatory_notice",
+        "data_privacy",
+        "ip",
+        "nda",
+        "procurement",
+        "litigation_threat",
+        "payment_dispute",
+        "compliance",
+        "corporate_governance",
+        "partnership",
+        "confidentiality",
+        "general_inquiry"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "Deadline": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "basis": {
+          "description": "e.g. \"15 days from receipt\"",
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        },
+        "computed_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Computed by code from the basis, never by the model",
+          "title": "Computed Date"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceQuote"
+        }
+      },
+      "required": [
+        "description",
+        "basis",
+        "source"
+      ],
+      "title": "Deadline",
+      "type": "object"
+    },
+    "Fact": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceQuote"
+        }
+      },
+      "required": [
+        "statement",
+        "source"
+      ],
+      "title": "Fact",
+      "type": "object"
+    },
+    "Intent": {
+      "enum": [
+        "question",
+        "review_request",
+        "notice",
+        "demand",
+        "fyi",
+        "scheduling"
+      ],
+      "title": "Intent",
+      "type": "string"
+    },
+    "LanguageInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "pattern": "^[a-z]{2,3}$",
+          "title": "Code",
+          "type": "string"
+        },
+        "script": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO 15924, e.g. \"Deva\", \"Taml\", \"Latn\"",
+          "title": "Script"
+        },
+        "romanised": {
+          "default": false,
+          "description": "e.g. Hindi written in Latin letters",
+          "title": "Romanised",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "LanguageInfo",
+      "type": "object"
+    },
+    "MatterCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "matter_id": {
+          "format": "uuid",
+          "title": "Matter Id",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "matter_id",
+        "score",
+        "reasons"
+      ],
+      "title": "MatterCandidate",
+      "type": "object"
+    },
+    "Party": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Email"
+        },
+        "organisation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organisation"
+        },
+        "role": {
+          "enum": [
+            "sender",
+            "recipient",
+            "internal_requester",
+            "counterparty",
+            "other"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "cin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Company Identification Number if found",
+          "title": "Cin"
+        }
+      },
+      "required": [
+        "name",
+        "role"
+      ],
+      "title": "Party",
+      "type": "object"
+    },
+    "RiskLevel": {
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    },
+    "Signal": {
+      "enum": [
+        "dispute",
+        "litigation_threat",
+        "regulator",
+        "breach",
+        "termination",
+        "indemnity_claim",
+        "fraud",
+        "criminal",
+        "data_incident"
+      ],
+      "title": "Signal",
+      "type": "string"
+    },
+    "SourceQuote": {
+      "additionalProperties": false,
+      "description": "An exact span from an email, attachment or document that supports a value.",
+      "properties": {
+        "source_id": {
+          "description": "Message ID, attachment ID or chunk ID",
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "quote"
+      ],
+      "title": "SourceQuote",
+      "type": "object"
+    },
+    "TriggerHit": {
+      "additionalProperties": false,
+      "description": "A hit from the deterministic escalation rules (keyword / sender), not the model.",
+      "properties": {
+        "rule_id": {
+          "minLength": 1,
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "matched_text": {
+          "minLength": 1,
+          "title": "Matched Text",
+          "type": "string"
+        },
+        "language": {
+          "pattern": "^[a-z]{2,3}$",
+          "title": "Language",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_id",
+        "matched_text",
+        "language"
+      ],
+      "title": "TriggerHit",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "message_id": {
+      "description": "RFC 5322 Message-ID",
+      "minLength": 1,
+      "title": "Message Id",
+      "type": "string"
+    },
+    "thread_id": {
+      "minLength": 1,
+      "title": "Thread Id",
+      "type": "string"
+    },
+    "received_at": {
+      "format": "date-time",
+      "title": "Received At",
+      "type": "string"
+    },
+    "sender": {
+      "$ref": "#/$defs/Party"
+    },
+    "language": {
+      "$ref": "#/$defs/LanguageInfo"
+    },
+    "attachments": {
+      "items": {
+        "$ref": "#/$defs/AttachmentInfo"
+      },
+      "title": "Attachments",
+      "type": "array"
+    },
+    "is_legal": {
+      "title": "Is Legal",
+      "type": "boolean"
+    },
+    "is_legal_reason": {
+      "minLength": 1,
+      "title": "Is Legal Reason",
+      "type": "string"
+    },
+    "category": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Category"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Required when is_legal is true"
+    },
+    "intent": {
+      "$ref": "#/$defs/Intent"
+    },
+    "parties": {
+      "items": {
+        "$ref": "#/$defs/Party"
+      },
+      "title": "Parties",
+      "type": "array"
+    },
+    "facts": {
+      "items": {
+        "$ref": "#/$defs/Fact"
+      },
+      "title": "Facts",
+      "type": "array"
+    },
+    "deadlines": {
+      "items": {
+        "$ref": "#/$defs/Deadline"
+      },
+      "title": "Deadlines",
+      "type": "array"
+    },
+    "signals": {
+      "items": {
+        "$ref": "#/$defs/Signal"
+      },
+      "title": "Signals",
+      "type": "array"
+    },
+    "escalation_triggers": {
+      "items": {
+        "$ref": "#/$defs/TriggerHit"
+      },
+      "title": "Escalation Triggers",
+      "type": "array"
+    },
+    "missing_info": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Info",
+      "type": "array"
+    },
+    "matter_candidates": {
+      "items": {
+        "$ref": "#/$defs/MatterCandidate"
+      },
+      "title": "Matter Candidates",
+      "type": "array"
+    },
+    "urgency": {
+      "$ref": "#/$defs/RiskLevel",
+      "description": "Set by rules from deadlines and signals, not the model"
+    },
+    "triage_model": {
+      "description": "Model ID used, for the Jev vs Haiku benchmark",
+      "minLength": 1,
+      "title": "Triage Model",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "message_id",
+    "thread_id",
+    "received_at",
+    "sender",
+    "language",
+    "is_legal",
+    "is_legal_reason",
+    "intent",
+    "urgency",
+    "triage_model"
+  ],
+  "title": "EmailRecord",
+  "type": "object"
+}

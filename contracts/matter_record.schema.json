@@ -1,0 +1,315 @@
+{
+  "$defs": {
+    "Category": {
+      "enum": [
+        "contract_review",
+        "vendor_dispute",
+        "customer_dispute",
+        "employment",
+        "regulatory_notice",
+        "data_privacy",
+        "ip",
+        "nda",
+        "procurement",
+        "litigation_threat",
+        "payment_dispute",
+        "compliance",
+        "corporate_governance",
+        "partnership",
+        "confidentiality",
+        "general_inquiry"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "Deadline": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "basis": {
+          "description": "e.g. \"15 days from receipt\"",
+          "minLength": 1,
+          "title": "Basis",
+          "type": "string"
+        },
+        "computed_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Computed by code from the basis, never by the model",
+          "title": "Computed Date"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceQuote"
+        }
+      },
+      "required": [
+        "description",
+        "basis",
+        "source"
+      ],
+      "title": "Deadline",
+      "type": "object"
+    },
+    "Decision": {
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "decided_by": {
+          "format": "uuid",
+          "title": "Decided By",
+          "type": "string"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "summary",
+        "decided_by",
+        "decided_at"
+      ],
+      "title": "Decision",
+      "type": "object"
+    },
+    "Party": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Email"
+        },
+        "organisation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Organisation"
+        },
+        "role": {
+          "enum": [
+            "sender",
+            "recipient",
+            "internal_requester",
+            "counterparty",
+            "other"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "cin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Company Identification Number if found",
+          "title": "Cin"
+        }
+      },
+      "required": [
+        "name",
+        "role"
+      ],
+      "title": "Party",
+      "type": "object"
+    },
+    "RiskLevel": {
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    },
+    "SourceQuote": {
+      "additionalProperties": false,
+      "description": "An exact span from an email, attachment or document that supports a value.",
+      "properties": {
+        "source_id": {
+          "description": "Message ID, attachment ID or chunk ID",
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "quote"
+      ],
+      "title": "SourceQuote",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "matter_id": {
+      "format": "uuid",
+      "title": "Matter Id",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/Category"
+    },
+    "parties": {
+      "items": {
+        "$ref": "#/$defs/Party"
+      },
+      "title": "Parties",
+      "type": "array"
+    },
+    "states": {
+      "description": "Establishment, employee workplace, place of execution, counterparty location",
+      "items": {
+        "pattern": "^IN-[A-Z]{2}$",
+        "type": "string"
+      },
+      "title": "States",
+      "type": "array"
+    },
+    "risk_level": {
+      "$ref": "#/$defs/RiskLevel"
+    },
+    "status": {
+      "enum": [
+        "open",
+        "awaiting_counterparty",
+        "awaiting_internal",
+        "escalated",
+        "closed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "deadlines": {
+      "items": {
+        "$ref": "#/$defs/Deadline"
+      },
+      "title": "Deadlines",
+      "type": "array"
+    },
+    "linked_message_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Linked Message Ids",
+      "type": "array"
+    },
+    "linked_document_ids": {
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Linked Document Ids",
+      "type": "array"
+    },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/Decision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "assigned_lawyer_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Assigned Lawyer Id"
+    },
+    "access_list": {
+      "description": "User IDs allowed to see this matter",
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Access List",
+      "type": "array"
+    },
+    "legal_hold": {
+      "default": false,
+      "title": "Legal Hold",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "matter_id",
+    "tenant_id",
+    "title",
+    "type",
+    "risk_level",
+    "status",
+    "access_list"
+  ],
+  "title": "MatterRecord",
+  "type": "object"
+}

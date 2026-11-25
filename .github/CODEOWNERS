@@ -1,0 +1,21 @@
+# Replace the placeholders with GitHub usernames, then enable "Require review from Code Owners"
+# on the main branch. Schema changes need both other people (team plan, working agreements).
+#
+# *                         SANA ARINA ABDUL
+# /src/counsel/contracts/   SANA ARINA ABDUL
+# /contracts/               SANA ARINA ABDUL
+# /src/counsel/ingest/      SANA
+# /src/counsel/triage/      SANA
+# /src/counsel/matters/     SANA
+# /evals/                   SANA
+# /src/counsel/kb/          ARINA
+# /src/counsel/agent/       ARINA
+# /src/counsel/verify/      ARINA
+# /src/counsel/gateway/     ABDUL
+# /src/counsel/policy/      ABDUL
+# /src/counsel/audit/       ABDUL
+# /src/counsel/api/         ABDUL
+# /console/                 ABDUL
+# /db/                      ABDUL
+# /infra/                   ABDUL
+# /.github/                 ABDUL

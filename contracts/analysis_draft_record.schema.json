@@ -1,0 +1,354 @@
+{
+  "$defs": {
+    "Citation": {
+      "additionalProperties": false,
+      "properties": {
+        "chunk_id": {
+          "minLength": 1,
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "heading_path": {
+          "description": "e.g. \"MSA > 9 Liability > 9.2\"",
+          "minLength": 1,
+          "title": "Heading Path",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chunk_id",
+        "heading_path",
+        "quote"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "minLength": 1,
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "citations": {
+          "description": "Every legal statement is cited",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "minItems": 1,
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "citations"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "DraftReply": {
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "minLength": 1,
+          "title": "Subject",
+          "type": "string"
+        },
+        "body": {
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        },
+        "language": {
+          "pattern": "^[a-z]{2,3}$",
+          "title": "Language",
+          "type": "string"
+        },
+        "to": {
+          "description": "Policy engine checks these are thread participants",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "To",
+          "type": "array"
+        }
+      },
+      "required": [
+        "subject",
+        "body",
+        "language",
+        "to"
+      ],
+      "title": "DraftReply",
+      "type": "object"
+    },
+    "Fact": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceQuote"
+        }
+      },
+      "required": [
+        "statement",
+        "source"
+      ],
+      "title": "Fact",
+      "type": "object"
+    },
+    "RiskFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "clause_ref": {
+          "minLength": 1,
+          "title": "Clause Ref",
+          "type": "string"
+        },
+        "finding": {
+          "enum": [
+            "preferred",
+            "within_fallback",
+            "beyond_walk_away",
+            "missing_required",
+            "unlimited_liability",
+            "foreign_governing_law",
+            "ambiguity"
+          ],
+          "title": "Finding",
+          "type": "string"
+        },
+        "points": {
+          "description": "From the lawyer-owned rules table, not the model",
+          "minimum": 0,
+          "title": "Points",
+          "type": "integer"
+        },
+        "evidence": {
+          "minLength": 1,
+          "title": "Evidence",
+          "type": "string"
+        }
+      },
+      "required": [
+        "clause_ref",
+        "finding",
+        "points",
+        "evidence"
+      ],
+      "title": "RiskFinding",
+      "type": "object"
+    },
+    "RiskLevel": {
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    },
+    "SourceQuote": {
+      "additionalProperties": false,
+      "description": "An exact span from an email, attachment or document that supports a value.",
+      "properties": {
+        "source_id": {
+          "description": "Message ID, attachment ID or chunk ID",
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "quote"
+      ],
+      "title": "SourceQuote",
+      "type": "object"
+    },
+    "VerifierResult": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "citation_resolved": {
+          "description": "Cited text exists in the retrieved source",
+          "title": "Citation Resolved",
+          "type": "boolean"
+        },
+        "supported": {
+          "description": "Source supports the claim (independent check)",
+          "title": "Supported",
+          "type": "boolean"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "claim_id",
+        "citation_resolved",
+        "supported"
+      ],
+      "title": "VerifierResult",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tenant_id": {
+      "format": "uuid",
+      "title": "Tenant Id",
+      "type": "string"
+    },
+    "matter_id": {
+      "format": "uuid",
+      "title": "Matter Id",
+      "type": "string"
+    },
+    "message_id": {
+      "minLength": 1,
+      "title": "Message Id",
+      "type": "string"
+    },
+    "facts": {
+      "items": {
+        "$ref": "#/$defs/Fact"
+      },
+      "title": "Facts",
+      "type": "array"
+    },
+    "interpretation": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Interpretation",
+      "type": "array"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "recommendation": {
+      "minLength": 1,
+      "title": "Recommendation",
+      "type": "string"
+    },
+    "verifier_results": {
+      "items": {
+        "$ref": "#/$defs/VerifierResult"
+      },
+      "title": "Verifier Results",
+      "type": "array"
+    },
+    "risk_findings": {
+      "items": {
+        "$ref": "#/$defs/RiskFinding"
+      },
+      "title": "Risk Findings",
+      "type": "array"
+    },
+    "risk_points": {
+      "minimum": 0,
+      "title": "Risk Points",
+      "type": "integer"
+    },
+    "risk_level": {
+      "$ref": "#/$defs/RiskLevel"
+    },
+    "draft_reply": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DraftReply"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Empty for CRITICAL matters: brief for counsel only"
+    },
+    "internal_note": {
+      "minLength": 1,
+      "title": "Internal Note",
+      "type": "string"
+    },
+    "draft_hash": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Draft Hash"
+    },
+    "model_ids": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Model Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "tenant_id",
+    "matter_id",
+    "message_id",
+    "recommendation",
+    "risk_points",
+    "risk_level",
+    "internal_note",
+    "model_ids"
+  ],
+  "title": "AnalysisDraftRecord",
+  "type": "object"
+}

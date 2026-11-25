@@ -1,0 +1,25 @@
+# Local development only. Real data never goes in here: anonymised test data only.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: counsel
+      POSTGRES_PASSWORD: counsel_dev
+      POSTGRES_DB: counsel
+    ports: ["5433:5432"]   # 5433 so it does not clash with a local Postgres on 5432
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U counsel"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      COUNSEL_DATABASE_URL: postgresql://counsel:counsel_dev@db:5432/counsel
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
